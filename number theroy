@@ -1,0 +1,157 @@
+// spf and sieve 
+const int MAX = 1e6 + 5;
+//const int k = 1e9 + 7;
+//const int mod=1e9+7;
+vector<int> sp(MAX);
+vector<bool> isPrime(MAX, true);
+vector<int> Prefix(MAX, 0),freq(MAX,0);
+void Sieve()
+{
+    isPrime[0]=isPrime[1]  = false;
+    for (int i = 2; i * i < MAX; ++i) {
+        if (isPrime[i]) {
+            for (int j = i * i; j < MAX; j += i) {
+                isPrime[j] = false;
+            }
+        }
+    }
+    for (int i = 2; i < MAX; ++i) {
+        if (isPrime[i]) {
+            for (int j = i; j < MAX; j += i) {
+                Prefix[i]+=freq[j];
+            }
+        }
+        Prefix[i]+=Prefix[i-1];
+    }
+}int cnt_prfactors(int n) {
+    int cnt = 0;
+    for (int i : primes) {
+        if(i*i>n)
+            break;
+        while (n%i==0) {
+            n/=i;
+            cnt++;
+        }
+    }
+    if(n>1) {
+       cnt++;
+    }
+    return cnt;
+}
+vector<pair<int,int>> prime_factor(int n) {
+    vector<pair<int,int>> prf;
+    for(int i=2;i*i<=n;i++) {
+        int c=0;
+        while(n%i==0) {
+            c++;
+            n/=i;
+        }
+        if(c>0)
+            prf.push_back({i,c});
+    }
+    if(n>1) prf.push_back({n,1});
+    return prf;
+}
+void spf() //O(N)
+{
+    for(int i = 0; i < MAX; i++) { sp[i] = i;}
+    for(int i = 2; i*i <= MAX; i++) {
+        for(int j = i*i; j < MAX; j += i) {
+            sp[j] = min(i,sp[j]);
+        }
+    }
+}
+================================================================== npr, ncr , modinverse 
+int add(int a,int b) {
+    return ((a%mod+b%mod))%mod;
+}
+int mul(int a,int b) {
+    return ((a%mod)*(b%mod))%mod;
+}
+int fastpow(int r,int p) {
+    int ret=1;
+    while(p) {
+        if(p&1) ret=mul(ret,r);
+        p>>=1;
+        r=mul(r,r);
+    }
+    return ret;
+}
+int modinverse(int n) {
+    return fastpow(n,mod-2);
+}
+int Fact[N],invFact[N];
+void pre() {
+    Fact[0]=1;
+    for(int i=1;i<N;i++) {
+        Fact[i]=mul(Fact[i-1],i);
+    }
+    invFact[N-1]=modinverse(Fact[N-1]);
+    for(int i=N-2;i>=0;i--) {
+        invFact[i]=mul(invFact[i+1],i+1);
+    }
+}
+int ncr(int n,int r) {
+    if(r>n||r<0) return 0;
+    return mul(mul(invFact[r],invFact[n-r]),Fact[n]);
+}
+int nCr(int n, int r) { // without modulo
+    if (r < 0 || r > n) return 0;
+    r = min(r, n - r);
+    int result = 1;
+    for (int i = 1; i <= r; ++i) {
+        result = result * (n - r + i) / i;
+    }
+    return result;
+}
+int npr(int n,int r) {
+    return mul(Fact[n],modinverse(Fact[n-r]));
+}
+=========================================================
+int fastpowmod(int n,int p,int k) {
+     if(p==0) return 1;
+     int val=fastpowmod(n,p/2,k);
+      if(p%2) {
+        return (val*val*n)%k;
+      }
+    else {
+        return (val*val)%k;
+    }
+}
+==================================================================
+bool powtwo(int n) {
+    if(n&(n-1)) return false;
+    return true;
+}
+=====================================================================
+/*bool is_prime(int n) {
+    if(n==1) return false;
+    for(int i = 2; i*i <= n; i++) {
+        if(n%i==0) return false;
+    }
+    return true;
+}*/
+=================================================================
+vector<int> divisors(int n) {
+    vector<int> divs;
+    for (int i = 1; i * i <= n; i++) {
+        if (n % i == 0) {
+            divs.push_back(i);
+            if (i != n / i)
+                divs.push_back(n / i);
+        }
+    }
+    return divs;
+}
+=====================================================================
+const int N=2e5+5;
+vector<int>DIVS[N];
+int d[N];
+void sevof_divs() {
+    for(int i = 1; i <= N; i++) {
+        for(int j = i; j <= N; j+=i) {
+            DIVS[j].push_back(i);
+            d[j]++;
+        }
+    }
+}
